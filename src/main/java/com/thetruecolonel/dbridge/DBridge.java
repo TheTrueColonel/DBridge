@@ -5,6 +5,8 @@ import com.thetruecolonel.dbridge.config.DBridgeConfig;
 import com.thetruecolonel.dbridge.discord.DiscordPoller;
 import com.thetruecolonel.dbridge.minecraft.ChatEventHandler;
 import com.thetruecolonel.dbridge.minecraft.CommandEventHandler;
+import com.thetruecolonel.dbridge.minecraft.DeathEventHandler;
+import com.thetruecolonel.dbridge.minecraft.JoinLeaveEventHandler;
 import com.thetruecolonel.dbridge.models.DiscordChannel;
 import com.thetruecolonel.dbridge.models.DiscordMessage;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -46,6 +48,9 @@ public class DBridge {
         ChatEventHandler chatHandler = new ChatEventHandler(webhook, inboundQueue);
         CommandEventHandler commandHandler = new CommandEventHandler(webhook);
 
+        JoinLeaveEventHandler joinLeaveHandler = new JoinLeaveEventHandler(webhook);
+        DeathEventHandler deathEventHandler = new DeathEventHandler(webhook);
+
         poller = new DiscordPoller(config.getChannelId(), config.getBotToken(), inboundQueue);
 
         getChannelName(config);
@@ -56,7 +61,19 @@ public class DBridge {
         FMLCommonHandler.instance().bus().register(chatHandler);
         FMLCommonHandler.instance().bus().register(commandHandler);
 
+        this.registerEventHandlers(
+                joinLeaveHandler,
+                deathEventHandler
+        );
+
         poller.start();
+    }
+
+    private void registerEventHandlers(Object... objs) {
+        for (Object o : objs) {
+            MinecraftForge.EVENT_BUS.register(o);
+            FMLCommonHandler.instance().bus().register(o);
+        }
     }
 
     @EventHandler
