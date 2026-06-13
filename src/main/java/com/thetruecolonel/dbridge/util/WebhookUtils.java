@@ -10,6 +10,20 @@ public final class WebhookUtils {
     private WebhookUtils() {}
 
     /**
+     * @see WebhookUtils#fireWebhook(DiscordWebhook, String, String, String, EmbedObject)
+     */
+    public static void fireWebhook(DiscordWebhook webhook, String avatarUrl, String username, String content) {
+        WebhookUtils.fireWebhook(webhook, avatarUrl, username, content, null);
+    }
+
+    /**
+     * @see WebhookUtils#fireWebhook(DiscordWebhook, String, String, String, EmbedObject)
+     */
+    public static void fireWebhook(DiscordWebhook webhook, String avatarUrl, String username, EmbedObject embedObject) {
+        WebhookUtils.fireWebhook(webhook, avatarUrl, "", username, embedObject);
+    }
+
+    /**
      * Fires a webhook message
      * @param avatarUrl the avatar url for the webhook
      * @param content the content
