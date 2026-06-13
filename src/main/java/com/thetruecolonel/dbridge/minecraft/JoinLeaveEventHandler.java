@@ -1,6 +1,6 @@
 package com.thetruecolonel.dbridge.minecraft;
 
-import com.thetruecolonel.dbridge.util.adapters.PlayerUtils;
+import com.thetruecolonel.dbridge.util.PlayerUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import me.micartey.webhookly.DiscordWebhook;
