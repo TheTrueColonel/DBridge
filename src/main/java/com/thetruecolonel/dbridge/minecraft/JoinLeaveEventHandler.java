@@ -48,13 +48,12 @@ public class JoinLeaveEventHandler {
 
 
     private EmbedObject buildEmbedFor(ConnectionState state, String username) {
-        return new EmbedObject()
-                .setThumbnail(
-                        new Thumbnail(PlayerUtils.getAvatarUrl(username))
+        // note: you can set a thumbnail but it kind of looks big
+        return new EmbedObject(
                 ).setColor(
                         state == ConnectionState.LOGIN ? Color.GREEN : Color.RED
                 ).setDescription(
-                        String.format("**%s has %s the server",
+                        String.format("**%s has %s the server**",
                                 username, state
                                 )
                 );
