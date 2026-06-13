@@ -1,0 +1,98 @@
+package com.thetruecolonel.dbridge;
+
+import com.google.gson.Gson;
+import com.thetruecolonel.dbridge.config.DBridgeConfig;
+import com.thetruecolonel.dbridge.discord.DiscordPoller;
+import com.thetruecolonel.dbridge.minecraft.ChatEventHandler;
+import com.thetruecolonel.dbridge.minecraft.CommandEventHandler;
+import com.thetruecolonel.dbridge.models.DiscordChannel;
+import com.thetruecolonel.dbridge.models.DiscordMessage;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
+import me.micartey.webhookly.DiscordWebhook;
+import net.minecraftforge.common.MinecraftForge;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+@Mod(modid = DBridge.MODID, version = DBridge.VERSION, name = DBridge.NAME, acceptableRemoteVersions = "*")
+public class DBridge {
+    public static final String MODID = "ttcdbridge";
+    public static final String VERSION = "1.0";
+    public static final String NAME = "Discord Bridge";
+
+    private static String channelName;
+
+    private DBridgeConfig config;
+    private DiscordPoller poller;
+
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        this.config = new DBridgeConfig(event.getSuggestedConfigurationFile());
+    }
+
+    @EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        ConcurrentLinkedQueue<DiscordMessage> inboundQueue = new ConcurrentLinkedQueue<>();
+
+        DiscordWebhook webhook = new DiscordWebhook(config.getWebhookUrl());
+        ChatEventHandler chatHandler = new ChatEventHandler(webhook, inboundQueue);
+        CommandEventHandler commandHandler = new CommandEventHandler(webhook);
+
+        poller = new DiscordPoller(config.getChannelId(), config.getBotToken(), inboundQueue);
+
+        getChannelName(config);
+
+        MinecraftForge.EVENT_BUS.register(chatHandler);
+        MinecraftForge.EVENT_BUS.register(commandHandler);
+
+        FMLCommonHandler.instance().bus().register(chatHandler);
+        FMLCommonHandler.instance().bus().register(commandHandler);
+
+        poller.start();
+    }
+
+    @EventHandler
+    public void serverStopping(FMLServerStoppingEvent event) {
+        poller.stop();
+    }
+
+    public static String getChannelName() {
+        return channelName;
+    }
+
+    private static void getChannelName(DBridgeConfig config) {
+        final Gson gson = new Gson();
+        final OkHttpClient client = new OkHttpClient();
+
+        String url = "https://discord.com/api/v10/channels/" + config.getChannelId();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bot " + config.getBotToken())
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful())
+                return;
+
+            ResponseBody body = response.body();
+
+            if (body == null)
+                return;
+
+            DiscordChannel channel = gson.fromJson(body.string(), DiscordChannel.class);
+
+            channelName = channel.getName();
+        } catch (Exception ignored) {
+            // Do nothing
+        }
+    }
+}
