@@ -1,4 +1,4 @@
-package com.thetruecolonel.dbridge.util.adapters;
+package com.thetruecolonel.dbridge.util;
 
 public final class PlayerUtils {
 
