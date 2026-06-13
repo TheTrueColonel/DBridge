@@ -1,6 +1,7 @@
 package com.thetruecolonel.dbridge.minecraft;
 
 import com.thetruecolonel.dbridge.util.PlayerUtils;
+import com.thetruecolonel.dbridge.util.ServerConstants;
 import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import me.micartey.webhookly.DiscordWebhook;
@@ -31,7 +32,7 @@ public class DeathEventHandler {
         WebhookUtils.fireWebhook(
                 webhook,
                 PlayerUtils.getAvatarUrl(username),
-                username,
+                ServerConstants.SERVER_NAME,
                 this.buildEmbedFor(message)
         );
     }
