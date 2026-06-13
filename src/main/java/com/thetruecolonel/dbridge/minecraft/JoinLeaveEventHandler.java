@@ -7,7 +7,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import me.micartey.webhookly.DiscordWebhook;
 import me.micartey.webhookly.embeds.EmbedObject;
-import me.micartey.webhookly.embeds.Thumbnail;
 
 import java.awt.Color;
 
