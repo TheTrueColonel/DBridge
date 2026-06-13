@@ -1,0 +1,47 @@
+package com.thetruecolonel.dbridge.util;
+
+import me.micartey.webhookly.DiscordWebhook;
+import me.micartey.webhookly.embeds.EmbedObject;
+
+import java.io.IOException;
+
+public final class WebhookUtils {
+
+    private WebhookUtils() {}
+
+    /**
+     * Fires a webhook message
+     * @param avatarUrl the avatar url for the webhook
+     * @param content the content
+     * @param username the username for the webhook
+     * @param embed the embed, can be {@code null}
+     * @apiNote this method clears the webhook state before and after execution
+     * to avoid state contamination.
+     */
+    public static void fireWebhook(DiscordWebhook webhook, String avatarUrl, String content, String username, EmbedObject embed) {
+        try {
+            WebhookUtils.cleanWebhookStates(webhook);
+            webhook.setAvatarUrl(avatarUrl);
+            webhook.setContent(content);
+            webhook.setUsername(username);
+            webhook.getEmbeds().clear();
+            if (embed != null) {
+                webhook.getEmbeds().add(embed);
+            }
+            webhook.execute();
+        } catch (IOException ignored) {
+            // no-op
+        } finally {
+            // clean up
+            WebhookUtils.cleanWebhookStates(webhook);
+        }
+    }
+
+    private static void cleanWebhookStates(DiscordWebhook webhook) {
+        // rain: default looks to be null
+        webhook.setAvatarUrl(null);
+        webhook.setUsername(null);
+        webhook.setContent(null);
+        webhook.getEmbeds().clear();
+    }
+}
