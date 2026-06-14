@@ -37,5 +37,5 @@ dependencies {
     api('com.squareup.okhttp3:okhttp:4.9.2')
     api('com.google.code.gson:gson:2.8.9')
 
-    api('com.github.micartey:webhookly:master-SNAPSHOT')
+    shadowImplementation('com.github.micartey:webhookly:master-SNAPSHOT')
 }
