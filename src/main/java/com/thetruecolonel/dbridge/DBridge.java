@@ -57,15 +57,11 @@ public class DBridge {
 
         getChannelName(config);
 
-        MinecraftForge.EVENT_BUS.register(chatHandler);
-        MinecraftForge.EVENT_BUS.register(commandHandler);
-
-        FMLCommonHandler.instance().bus().register(chatHandler);
-        FMLCommonHandler.instance().bus().register(commandHandler);
-
         this.registerEventHandlers(
-                joinLeaveHandler,
-                deathEventHandler
+            chatHandler,
+            commandHandler,
+            joinLeaveHandler,
+            deathEventHandler
         );
 
         poller.start();
