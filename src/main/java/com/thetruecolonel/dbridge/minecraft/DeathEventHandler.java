@@ -22,8 +22,8 @@ public class DeathEventHandler {
     @SubscribeEvent
     public void onPlayerDeath(LivingDeathEvent event) {
         Entity e = event.entity;
-        if (!(e instanceof EntityPlayer)) return;
-        EntityPlayer player = (EntityPlayer) e;
+        if (!(e instanceof EntityPlayer player))
+            return;
 
         String message = event.source.func_151519_b(player).getUnformattedTextForChat();
 

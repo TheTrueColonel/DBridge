@@ -25,11 +25,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@Mod(modid = DBridge.MODID, version = DBridge.VERSION, name = DBridge.NAME, acceptableRemoteVersions = "*")
+@Mod(modid = DBridge.MODID, version = Tags.VERSION, name = "Discord Bridge",
+    acceptedMinecraftVersions = "[1.7.10]", acceptableRemoteVersions = "*")
 public class DBridge {
     public static final String MODID = "ttcdbridge";
-    public static final String VERSION = "1.0.4";
-    public static final String NAME = "Discord Bridge";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
     private static String channelName;
@@ -67,13 +66,6 @@ public class DBridge {
         poller.start();
     }
 
-    private void registerEventHandlers(Object... objs) {
-        for (Object o : objs) {
-            MinecraftForge.EVENT_BUS.register(o);
-            FMLCommonHandler.instance().bus().register(o);
-        }
-    }
-
     @Mod.EventHandler
     public void serverStopping(FMLServerStoppingEvent event) {
         poller.stop();
@@ -108,6 +100,13 @@ public class DBridge {
             channelName = channel.getName();
         } catch (Exception ex) {
             LOG.error("Unable to get channel name for channelId {}", config.getChannelId(), ex);
+        }
+    }
+
+    private void registerEventHandlers(Object... objs) {
+        for (Object o : objs) {
+            MinecraftForge.EVENT_BUS.register(o);
+            FMLCommonHandler.instance().bus().register(o);
         }
     }
 }

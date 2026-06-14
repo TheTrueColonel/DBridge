@@ -18,7 +18,9 @@ public class DBridgeConfig {
         channelId = config.get(Configuration.CATEGORY_GENERAL, "channelId", "").getString();
         botToken = config.get(Configuration.CATEGORY_GENERAL, "botToken", "").getString();
 
-        config.save();
+        if (config.hasChanged()) {
+            config.save();
+        }
     }
 
     public String getWebhookUrl() { return webhookUrl; }

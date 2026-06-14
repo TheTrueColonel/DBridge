@@ -174,4 +174,37 @@ replay_pid*
 
 # End of https://www.toptal.com/developers/gitignore/api/forgegradle,java,intellij
 
+.settings
 .idea
+/.idea/
+/.vscode/
+/run/
+/build/
+/eclipse/
+/bin/
+/config/
+/crash-reports/
+/logs/
+options.txt
+/saves/
+usernamecache.json
+banned-ips.json
+banned-players.json
+eula.txt
+ops.json
+server.properties
+servers.dat
+usercache.json
+whitelist.json
+/out/
+*.iml
+*.ipr
+*.bat
+*.DS_Store
+!gradlew.bat
+.factorypath
+addon.local.gradle
+addon.local.gradle.kts
+addon.late.local.gradle
+addon.late.local.gradle.kts
+layout.json
