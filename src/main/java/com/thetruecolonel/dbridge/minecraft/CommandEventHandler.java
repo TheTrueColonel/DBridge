@@ -1,10 +1,9 @@
 package com.thetruecolonel.dbridge.minecraft;
 
+import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import me.micartey.webhookly.DiscordWebhook;
 import net.minecraftforge.event.CommandEvent;
-
-import java.io.IOException;
 
 public class CommandEventHandler {
     private final DiscordWebhook webhook;
@@ -21,14 +20,6 @@ public class CommandEventHandler {
 
         String message = String.join(" ", event.parameters);
 
-        webhook.setUsername("Server");
-        webhook.setAvatarUrl("");
-        webhook.setContent(message);
-
-        try {
-            webhook.execute();
-        } catch (IOException exception) {
-            // Do nothing
-        }
+        WebhookUtils.sendSystemMessage(webhook, message);
     }
 }

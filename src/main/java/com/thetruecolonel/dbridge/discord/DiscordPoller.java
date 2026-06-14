@@ -2,6 +2,7 @@ package com.thetruecolonel.dbridge.discord;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.thetruecolonel.dbridge.DBridge;
 import com.thetruecolonel.dbridge.models.DiscordMessage;
 import com.thetruecolonel.dbridge.util.adapters.InstantAdapter;
 import okhttp3.OkHttpClient;
@@ -68,8 +69,8 @@ public class DiscordPoller {
                 return;
 
             parseAndQueue(body.string());
-        } catch (Exception ignored) {
-            // Do nothing
+        } catch (Exception ex) {
+            DBridge.LOG.error("Error polling discord channel: {}, lastMessageId: {}", channelId, lastMessageId, ex);
         }
     }
 

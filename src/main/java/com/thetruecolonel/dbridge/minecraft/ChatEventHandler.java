@@ -2,10 +2,10 @@ package com.thetruecolonel.dbridge.minecraft;
 
 import com.thetruecolonel.dbridge.DBridge;
 import com.thetruecolonel.dbridge.models.DiscordMessage;
+import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 
-import java.io.IOException;
 import java.util.Queue;
 
 import me.micartey.webhookly.DiscordWebhook;
@@ -26,22 +26,12 @@ public class ChatEventHandler {
 
     @SubscribeEvent
     public void onServerChat(ServerChatEvent event) {
-        String headImage = "https://mc-heads.net/avatar/" + event.username + "/100";
-
-        webhook.setUsername(event.username);
-        webhook.setAvatarUrl(headImage);
-        webhook.setContent(event.message);
-
-        try {
-            webhook.execute();
-        } catch (IOException exception) {
-            // Do nothing
-        }
+        WebhookUtils.sendUserMessage(webhook, event);
     }
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.START)
+        if (event.phase != TickEvent.Phase.END)
             return;
 
         DiscordMessage msg;
