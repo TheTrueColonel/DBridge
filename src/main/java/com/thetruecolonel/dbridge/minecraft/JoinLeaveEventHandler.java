@@ -54,8 +54,7 @@ public class JoinLeaveEventHandler {
 
     private enum ConnectionState {
         LOGIN("logged in to", Color.GREEN),
-        LOGOUT("logged out of", Color.RED)
-        ;
+        LOGOUT("logged out of", Color.RED);
 
         private final String message;
 

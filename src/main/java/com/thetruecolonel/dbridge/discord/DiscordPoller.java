@@ -85,16 +85,16 @@ public class DiscordPoller {
 
         Arrays.sort(parsedMessages, Comparator.comparing(DiscordMessage::getTimestamp));
 
-        if (lastMessageId == 0) {
-            lastMessageId = parsedMessages[parsedMessages.length - 1].getId();
-
-            return;
-        }
-
         List<DiscordMessage> toQueue = Arrays.stream(parsedMessages)
                 .filter(discordMessage -> !discordMessage.getAuthor().isBot() &&
                         IntStream.of(validTypes).anyMatch(x -> x == discordMessage.getType()))
                 .collect(Collectors.toList());
+
+        if (lastMessageId == 0 || toQueue.isEmpty()) {
+            lastMessageId = parsedMessages[parsedMessages.length - 1].getId();
+
+            return;
+        }
 
         for (DiscordMessage message : toQueue) {
             lastMessageId = message.getId();

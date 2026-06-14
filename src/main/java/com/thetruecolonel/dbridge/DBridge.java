@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Mod(modid = DBridge.MODID, version = DBridge.VERSION, name = DBridge.NAME, acceptableRemoteVersions = "*")
 public class DBridge {
     public static final String MODID = "ttcdbridge";
-    public static final String VERSION = "1.0.2";
+    public static final String VERSION = "1.0.3";
     public static final String NAME = "Discord Bridge";
     public static final Logger LOG = LogManager.getLogger(MODID);
 

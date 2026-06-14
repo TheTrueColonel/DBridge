@@ -30,10 +30,10 @@ public class DeathEventHandler {
         String username = player.getDisplayName();
 
         WebhookUtils.fireWebhook(
-                webhook,
-                PlayerUtils.getAvatarUrl(username),
-                ServerConstants.SERVER_NAME,
-                this.buildEmbedFor(message)
+            webhook,
+            PlayerUtils.getAvatarUrl(username),
+            ServerConstants.SERVER_NAME,
+            this.buildEmbedFor(message)
         );
     }
 

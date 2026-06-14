@@ -13,12 +13,11 @@ public final class WebhookUtils {
         /* This utility class should not be instantiated */
     }
 
-
     /**
      * @see WebhookUtils#fireWebhook(DiscordWebhook, String, String, String, EmbedObject)
      */
     public static void fireWebhook(DiscordWebhook webhook, String avatarUrl, String username, String content) {
-        WebhookUtils.fireWebhook(webhook, avatarUrl, username, content, null);
+        WebhookUtils.fireWebhook(webhook, avatarUrl, content, username, null);
     }
 
     /**
@@ -44,12 +43,14 @@ public final class WebhookUtils {
             webhook.setContent(content);
             webhook.setUsername(username);
             webhook.getEmbeds().clear();
+
             if (embed != null) {
                 webhook.getEmbeds().add(embed);
             }
+
             webhook.execute();
-        } catch (IOException ignored) {
-            // no-op
+        } catch (IOException ex) {
+            DBridge.LOG.error("Failed to send webhook!", ex);
         } finally {
             // clean up
             WebhookUtils.cleanWebhookStates(webhook);
@@ -65,28 +66,20 @@ public final class WebhookUtils {
     }
   
     public static void sendUserMessage(DiscordWebhook webhook, ServerChatEvent event) {
-        String headImage = "https://mc-heads.net/avatar/" + event.username + "/100";
-
-        webhook.setUsername(event.username);
-        webhook.setAvatarUrl(headImage);
-        webhook.setContent(event.message);
-
-        try {
-            webhook.execute();
-        } catch (IOException ex) {
-            DBridge.LOG.error("Failed to send User Message!", ex);
-        }
+        WebhookUtils.fireWebhook(
+            webhook,
+            PlayerUtils.getAvatarUrl(event.username),
+            event.username,
+            event.message
+        );
     }
 
     public static void sendSystemMessage(DiscordWebhook webhook, String message) {
-        webhook.setUsername("Server");
-        webhook.setAvatarUrl("");
-        webhook.setContent(message);
-
-        try {
-            webhook.execute();
-        } catch (IOException ex) {
-            DBridge.LOG.error("Failed to send system message!", ex);
-        }
+        WebhookUtils.fireWebhook(
+            webhook,
+            null,
+            ServerConstants.SERVER_NAME,
+            message
+        );
     }
 }
