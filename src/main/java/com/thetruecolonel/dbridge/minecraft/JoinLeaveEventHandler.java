@@ -45,34 +45,34 @@ public class JoinLeaveEventHandler {
         );
     }
 
-
-
     private EmbedObject buildEmbedFor(ConnectionState state, String username) {
         // note: you can set a thumbnail but it kind of looks big
-        return new EmbedObject(
-                ).setColor(
-                        state == ConnectionState.LOGIN ? Color.GREEN : Color.RED
-                ).setDescription(
-                        String.format("**%s has %s the server**",
-                                username, state
-                                )
-                );
+        return new EmbedObject()
+                .setColor(state.getEmbedColor())
+                .setDescription(String.format("**%s has %s the server**", username, state));
     }
 
     private enum ConnectionState {
-        LOGIN("logged in to"),
-        LOGOUT("logged out of")
+        LOGIN("logged in to", Color.GREEN),
+        LOGOUT("logged out of", Color.RED)
         ;
 
         private final String message;
 
-        ConnectionState(String message) {
+        private final Color embedColor;
+
+        ConnectionState(String message, Color embedColor) {
             this.message = message;
+            this.embedColor = embedColor;
         }
 
         @Override
         public String toString() {
             return this.message;
+        }
+
+        public Color getEmbedColor() {
+            return embedColor;
         }
     }
 }

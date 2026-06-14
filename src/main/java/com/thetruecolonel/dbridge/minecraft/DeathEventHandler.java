@@ -38,11 +38,8 @@ public class DeathEventHandler {
     }
 
     private EmbedObject buildEmbedFor(String message) {
-        return new EmbedObject(
-                ).setColor(
-                        Color.RED
-                ).setDescription(
-                        String.format("**%s**", message)
-                );
+        return new EmbedObject()
+                .setColor(Color.RED)
+                .setDescription(String.format("**%s**", message));
     }
 }
