@@ -1,6 +1,7 @@
 package com.thetruecolonel.dbridge.minecraft;
 
 import com.thetruecolonel.dbridge.DBridge;
+import com.thetruecolonel.dbridge.models.DiscordAttachment;
 import com.thetruecolonel.dbridge.models.DiscordMessage;
 import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -9,6 +10,7 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import java.util.Queue;
 
 import me.micartey.webhookly.DiscordWebhook;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.ServerChatEvent;
@@ -36,17 +38,33 @@ public class ChatEventHandler {
 
         DiscordMessage msg;
         while ((msg = inboundQueue.poll()) != null) {
-            String outputMessage = new StringBuffer()
+            StringBuilder outputMessageBuffer = new StringBuilder()
                     .append("<#")
                     .append(DBridge.getChannelName())
                     .append(" | ")
-                    .append(msg.getAuthor().getUsername())
-                    .append("> ")
-                    .append(msg.getContent()).toString();
+                    .append(msg.getAuthor().getUsername());
+
+            if (msg.getContent().isEmpty()) {
+                outputMessageBuffer.append(">");
+            } else {
+                outputMessageBuffer.append("> ").append(msg.getContent());
+            }
+
+            ChatComponentText component = new ChatComponentText(outputMessageBuffer.toString());
+
+            if (!msg.getAttachments().isEmpty()) {
+                for (DiscordAttachment attachment : msg.getAttachments()) {
+                    ChatComponentText link = new ChatComponentText(" [Attachment]");
+
+                    link.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, attachment.getUrl()));
+
+                    component.appendSibling(link);
+                }
+            }
 
             MinecraftServer.getServer()
                     .getConfigurationManager()
-                    .sendChatMsg(new ChatComponentText(outputMessage));
+                    .sendChatMsg(component);
         }
     }
 }
