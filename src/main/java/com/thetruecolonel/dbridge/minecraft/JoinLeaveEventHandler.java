@@ -37,11 +37,11 @@ public class JoinLeaveEventHandler {
         String username = event.player.getDisplayName();
 
         WebhookUtils.fireWebhook(
-                webhook,
-                PlayerUtils.getAvatarUrl(username),
-                "",
-                ServerConstants.SERVER_NAME,
-                this.buildEmbedFor(state, username)
+            webhook,
+            PlayerUtils.getAvatarUrl(username),
+            "",
+            ServerConstants.SERVER_EVENT_NAME,
+            this.buildEmbedFor(state, username)
         );
     }
 

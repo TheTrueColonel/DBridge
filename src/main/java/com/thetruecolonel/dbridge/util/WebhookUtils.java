@@ -8,7 +8,6 @@ import net.minecraftforge.event.ServerChatEvent;
 import java.io.IOException;
 
 public final class WebhookUtils {
-  
     private WebhookUtils() {
         /* This utility class should not be instantiated */
     }

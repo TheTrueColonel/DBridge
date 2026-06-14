@@ -17,7 +17,7 @@ buildscript {
 apply plugin: 'forge'
 apply plugin: 'java'
 
-version = "1.0.3"
+version = "1.0.4"
 group = "com.thetruecolonel.dbridge"
 archivesBaseName = "ttcdbridge"
 
@@ -28,7 +28,7 @@ repositories {
 
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
-    runDir = "eclipse"
+    runDir = "run"
 }
 
 configurations {

@@ -32,7 +32,7 @@ public class DeathEventHandler {
         WebhookUtils.fireWebhook(
             webhook,
             PlayerUtils.getAvatarUrl(username),
-            ServerConstants.SERVER_NAME,
+            ServerConstants.SERVER_EVENT_NAME,
             this.buildEmbedFor(message)
         );
     }
