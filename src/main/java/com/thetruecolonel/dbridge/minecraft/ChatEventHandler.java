@@ -11,6 +11,7 @@ import java.util.Queue;
 
 import me.micartey.webhookly.DiscordWebhook;
 import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.ServerChatEvent;
@@ -56,7 +57,9 @@ public class ChatEventHandler {
                 for (DiscordAttachment attachment : msg.getAttachments()) {
                     ChatComponentText link = new ChatComponentText(" [Attachment]");
 
-                    link.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, attachment.getUrl()));
+                    link.getChatStyle()
+                        .setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, attachment.getUrl()))
+                        .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Open in browser")));
 
                     component.appendSibling(link);
                 }
