@@ -52,8 +52,8 @@ public final class WebhookUtils {
         WebhookUtils.fireWebhook(
             webhook,
             PlayerUtils.getAvatarUrl(event.username),
-            event.username,
-            event.message
+            event.message,
+            event.username
         );
     }
 
@@ -61,8 +61,8 @@ public final class WebhookUtils {
         WebhookUtils.fireWebhook(
             webhook,
             null,
-            ServerConstants.SERVER_NAME,
-            message
+            message,
+            ServerConstants.SERVER_NAME
         );
     }
 }
