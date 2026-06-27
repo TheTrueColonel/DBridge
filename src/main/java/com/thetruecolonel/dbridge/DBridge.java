@@ -1,28 +1,30 @@
 package com.thetruecolonel.dbridge;
 
-import com.google.gson.Gson;
+import club.minnced.discord.webhook.WebhookClient;
 import com.thetruecolonel.dbridge.config.DBridgeConfig;
-import com.thetruecolonel.dbridge.discord.DiscordPoller;
+import com.thetruecolonel.dbridge.jda.JdaEvents;
 import com.thetruecolonel.dbridge.minecraft.ChatEventHandler;
 import com.thetruecolonel.dbridge.minecraft.CommandEventHandler;
 import com.thetruecolonel.dbridge.minecraft.DeathEventHandler;
 import com.thetruecolonel.dbridge.minecraft.JoinLeaveEventHandler;
-import com.thetruecolonel.dbridge.models.DiscordChannel;
 import com.thetruecolonel.dbridge.models.DiscordMessage;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import me.micartey.webhookly.DiscordWebhook;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.minecraftforge.common.MinecraftForge;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Mod(modid = DBridge.MODID, version = Tags.VERSION, name = "Discord Bridge",
@@ -31,10 +33,14 @@ public class DBridge {
     public static final String MODID = "ttcdbridge";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
-    private static String channelName;
+    private static final EnumSet<GatewayIntent> intents = EnumSet.of(
+        GatewayIntent.GUILD_MESSAGES,
+        GatewayIntent.MESSAGE_CONTENT
+    );
 
+    private JDA jda;
+    private WebhookClient webhook;
     private DBridgeConfig config;
-    private DiscordPoller poller;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -43,18 +49,61 @@ public class DBridge {
 
     @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
+        String webhookUrl;
         ConcurrentLinkedQueue<DiscordMessage> inboundQueue = new ConcurrentLinkedQueue<>();
 
-        DiscordWebhook webhook = new DiscordWebhook(config.getWebhookUrl());
+        if (config.getWebhookId().isEmpty() || config.getChannelId().isEmpty() || config.getBotToken().isEmpty()) {
+            LOG.error("Config not filled out. Disabling...");
+
+            return;
+        }
+
+        try {
+            jda = JDABuilder.createLight(config.getBotToken(), intents)
+                .addEventListeners(new JdaEvents(config, inboundQueue))
+                .setActivity(Activity.playing("I'm gregging it"))
+                .build();
+
+            jda.getRestPing().queue(x -> LOG.info("Logged in with ping: {}", x));
+
+            jda.awaitReady();
+
+            TextChannel channel = jda.getTextChannelById(config.getChannelId());
+
+            if (channel == null) {
+                LOG.error("Could not find channel with id '{}'. Disabling...", config.getChannelId());
+
+                return;
+            }
+
+            List<Webhook> webhooks = channel.retrieveWebhooks().complete();
+
+            Webhook existing = webhooks.stream()
+                .filter(x -> x.getName().equals(config.getWebhookId()))
+                .findFirst()
+                .orElse(null);
+
+            if (existing != null) {
+                webhookUrl = existing.getUrl();
+            } else {
+                Webhook created = channel.createWebhook(config.getWebhookId()).complete();
+                webhookUrl = created.getUrl();
+            }
+
+            this.webhook = WebhookClient.withUrl(webhookUrl);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+
+            LOG.error("Failed to initialize DBridge", ex);
+
+            return;
+        }
+
         ChatEventHandler chatHandler = new ChatEventHandler(webhook, inboundQueue);
         CommandEventHandler commandHandler = new CommandEventHandler(webhook);
 
         JoinLeaveEventHandler joinLeaveHandler = new JoinLeaveEventHandler(webhook);
         DeathEventHandler deathEventHandler = new DeathEventHandler(webhook);
-
-        poller = new DiscordPoller(config.getChannelId(), config.getBotToken(), inboundQueue);
-
-        getChannelName(config);
 
         this.registerEventHandlers(
             chatHandler,
@@ -62,44 +111,16 @@ public class DBridge {
             joinLeaveHandler,
             deathEventHandler
         );
-
-        poller.start();
     }
 
     @Mod.EventHandler
     public void serverStopping(FMLServerStoppingEvent event) {
-        poller.stop();
-    }
+        if (webhook != null) {
+            webhook.close();
+        }
 
-    public static String getChannelName() {
-        return channelName;
-    }
-
-    private static void getChannelName(DBridgeConfig config) {
-        final Gson gson = new Gson();
-        final OkHttpClient client = new OkHttpClient();
-
-        String url = "https://discord.com/api/v10/channels/" + config.getChannelId();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .header("Authorization", "Bot " + config.getBotToken())
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful())
-                return;
-
-            ResponseBody body = response.body();
-
-            if (body == null)
-                return;
-
-            DiscordChannel channel = gson.fromJson(body.string(), DiscordChannel.class);
-
-            channelName = channel.getName();
-        } catch (Exception ex) {
-            LOG.error("Unable to get channel name for channelId {}", config.getChannelId(), ex);
+        if (jda != null) {
+            jda.shutdown();
         }
     }
 

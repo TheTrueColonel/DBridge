@@ -1,0 +1,4 @@
+shadowJar {
+    relocate 'net.dv8tion', 'com.thetruecolonel.dbridge.shadow.jda'
+    relocate 'club.minnced', 'com.thetruecolonel.dbridge.shadow.minnced'
+}

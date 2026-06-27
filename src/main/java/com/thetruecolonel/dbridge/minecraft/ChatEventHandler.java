@@ -1,7 +1,6 @@
 package com.thetruecolonel.dbridge.minecraft;
 
-import com.thetruecolonel.dbridge.DBridge;
-import com.thetruecolonel.dbridge.models.DiscordAttachment;
+import club.minnced.discord.webhook.WebhookClient;
 import com.thetruecolonel.dbridge.models.DiscordMessage;
 import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -9,22 +8,20 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 
 import java.util.Queue;
 
-import me.micartey.webhookly.DiscordWebhook;
+import net.dv8tion.jda.api.entities.Message;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.ServerChatEvent;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 public class ChatEventHandler {
-    private final DiscordWebhook webhook;
-    private final ConcurrentLinkedQueue<DiscordMessage> inboundQueue;
+    private final WebhookClient webhook;
+    private final Queue<DiscordMessage> inboundQueue;
 
-    public ChatEventHandler(DiscordWebhook webhook, Queue<DiscordMessage> queue) {
+    public ChatEventHandler(WebhookClient webhook, Queue<DiscordMessage> queue) {
         this.webhook = webhook;
-        this.inboundQueue = (ConcurrentLinkedQueue<DiscordMessage>) queue;
+        this.inboundQueue = queue;
     }
 
     @SubscribeEvent
@@ -41,20 +38,20 @@ public class ChatEventHandler {
         while ((msg = inboundQueue.poll()) != null) {
             StringBuilder outputMessageBuffer = new StringBuilder()
                     .append("<#")
-                    .append(DBridge.getChannelName())
+                    .append(msg.channelName())
                     .append(" | ")
-                    .append(msg.getAuthor().getUsername());
+                    .append(msg.author().username());
 
-            if (msg.getContent().isEmpty()) {
+            if (msg.content().isEmpty()) {
                 outputMessageBuffer.append(">");
             } else {
-                outputMessageBuffer.append("> ").append(msg.getContent());
+                outputMessageBuffer.append("> ").append(msg.content());
             }
 
             ChatComponentText component = new ChatComponentText(outputMessageBuffer.toString());
 
-            if (!msg.getAttachments().isEmpty()) {
-                for (DiscordAttachment attachment : msg.getAttachments()) {
+            if (!msg.attachments().isEmpty()) {
+                for (Message.Attachment attachment : msg.attachments()) {
                     ChatComponentText link = new ChatComponentText(" [Attachment]");
 
                     link.getChatStyle()

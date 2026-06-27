@@ -1,11 +1,10 @@
 package com.thetruecolonel.dbridge.util;
 
-import me.micartey.webhookly.DiscordWebhook;
-import me.micartey.webhookly.embeds.EmbedObject;
-import com.thetruecolonel.dbridge.DBridge;
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.AllowedMentions;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import net.minecraftforge.event.ServerChatEvent;
-
-import java.io.IOException;
 
 public final class WebhookUtils {
     private WebhookUtils() {
@@ -13,16 +12,16 @@ public final class WebhookUtils {
     }
 
     /**
-     * @see WebhookUtils#fireWebhook(DiscordWebhook, String, String, String, EmbedObject)
+     * @see WebhookUtils#fireWebhook(WebhookClient, String, String, String, WebhookEmbed)
      */
-    public static void fireWebhook(DiscordWebhook webhook, String avatarUrl, String username, String content) {
+    public static void fireWebhook(WebhookClient webhook, String avatarUrl, String content, String username) {
         WebhookUtils.fireWebhook(webhook, avatarUrl, content, username, null);
     }
 
     /**
-     * @see WebhookUtils#fireWebhook(DiscordWebhook, String, String, String, EmbedObject)
+     * @see WebhookUtils#fireWebhook(WebhookClient, String, String, String, WebhookEmbed)
      */
-    public static void fireWebhook(DiscordWebhook webhook, String avatarUrl, String username, EmbedObject embedObject) {
+    public static void fireWebhook(WebhookClient webhook, String avatarUrl, String username, WebhookEmbed embedObject) {
         WebhookUtils.fireWebhook(webhook, avatarUrl, "", username, embedObject);
     }
 
@@ -35,36 +34,21 @@ public final class WebhookUtils {
      * @apiNote this method clears the webhook state before and after execution
      * to avoid state contamination.
      */
-    public static void fireWebhook(DiscordWebhook webhook, String avatarUrl, String content, String username, EmbedObject embed) {
-        try {
-            WebhookUtils.cleanWebhookStates(webhook);
-            webhook.setAvatarUrl(avatarUrl);
-            webhook.setContent(content);
-            webhook.setUsername(username);
-            webhook.getEmbeds().clear();
+    public static void fireWebhook(WebhookClient webhook, String avatarUrl, String content, String username, WebhookEmbed embed) {
+        WebhookMessageBuilder builder = new WebhookMessageBuilder()
+            .setUsername(username)
+            .setAvatarUrl(avatarUrl)
+            .setContent(content)
+            .setAllowedMentions(AllowedMentions.none());
 
-            if (embed != null) {
-                webhook.getEmbeds().add(embed);
-            }
-
-            webhook.execute();
-        } catch (IOException ex) {
-            DBridge.LOG.error("Failed to send webhook!", ex);
-        } finally {
-            // clean up
-            WebhookUtils.cleanWebhookStates(webhook);
+        if (embed != null) {
+            builder.addEmbeds(embed);
         }
+
+        webhook.send(builder.build());
     }
 
-    private static void cleanWebhookStates(DiscordWebhook webhook) {
-        // rain: default looks to be null
-        webhook.setAvatarUrl(null);
-        webhook.setUsername(null);
-        webhook.setContent(null);
-        webhook.getEmbeds().clear();    
-    }
-  
-    public static void sendUserMessage(DiscordWebhook webhook, ServerChatEvent event) {
+    public static void sendUserMessage(WebhookClient webhook, ServerChatEvent event) {
         WebhookUtils.fireWebhook(
             webhook,
             PlayerUtils.getAvatarUrl(event.username),
@@ -73,7 +57,7 @@ public final class WebhookUtils {
         );
     }
 
-    public static void sendSystemMessage(DiscordWebhook webhook, String message) {
+    public static void sendSystemMessage(WebhookClient webhook, String message) {
         WebhookUtils.fireWebhook(
             webhook,
             null,

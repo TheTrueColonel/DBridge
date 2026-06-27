@@ -1,14 +1,14 @@
 package com.thetruecolonel.dbridge.minecraft;
 
+import club.minnced.discord.webhook.WebhookClient;
 import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import me.micartey.webhookly.DiscordWebhook;
 import net.minecraftforge.event.CommandEvent;
 
 public class CommandEventHandler {
-    private final DiscordWebhook webhook;
+    private final WebhookClient webhook;
 
-    public CommandEventHandler(DiscordWebhook webhook) {
+    public CommandEventHandler(WebhookClient webhook) {
         this.webhook = webhook;
     }
 

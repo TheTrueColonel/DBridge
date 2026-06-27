@@ -1,11 +1,12 @@
 package com.thetruecolonel.dbridge.minecraft;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.thetruecolonel.dbridge.util.PlayerUtils;
 import com.thetruecolonel.dbridge.util.ServerConstants;
 import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import me.micartey.webhookly.DiscordWebhook;
-import me.micartey.webhookly.embeds.EmbedObject;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -13,9 +14,9 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import java.awt.Color;
 
 public class DeathEventHandler {
-    private final DiscordWebhook webhook;
+    private final WebhookClient webhook;
 
-    public DeathEventHandler(DiscordWebhook webhook) {
+    public DeathEventHandler(WebhookClient webhook) {
         this.webhook = webhook;
     }
 
@@ -37,9 +38,10 @@ public class DeathEventHandler {
         );
     }
 
-    private EmbedObject buildEmbedFor(String message) {
-        return new EmbedObject()
-                .setColor(Color.RED)
-                .setDescription(String.format("**%s**", message));
+    private WebhookEmbed buildEmbedFor(String message) {
+        return new WebhookEmbedBuilder()
+            .setColor(Color.RED.getRGB() & 0xFFFFFF)
+            .setDescription(String.format("**%s**", message))
+            .build();
     }
 }

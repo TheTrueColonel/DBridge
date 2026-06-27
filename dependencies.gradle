@@ -34,8 +34,14 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-    shadowImplementation('com.squareup.okhttp3:okhttp:4.9.2')
-    compileOnly('com.google.code.gson:gson:2.8.9')
+    shadowImplementation('net.dv8tion:JDA:6.4.2') {
+        exclude module: 'opus-java'
+        exclude module: 'tink'
+    }
 
-    shadowImplementation('com.github.micartey:webhookly:master-SNAPSHOT')
+    shadowImplementation('club.minnced:discord-webhooks:0.8.4') {
+        exclude module: 'opus-java'
+    }
+
+    shadowImplementation 'org.slf4j:slf4j-nop:2.0.18'
 }

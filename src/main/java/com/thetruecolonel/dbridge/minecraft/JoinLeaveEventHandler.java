@@ -1,19 +1,20 @@
 package com.thetruecolonel.dbridge.minecraft;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import com.thetruecolonel.dbridge.util.PlayerUtils;
 import com.thetruecolonel.dbridge.util.ServerConstants;
 import com.thetruecolonel.dbridge.util.WebhookUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
-import me.micartey.webhookly.DiscordWebhook;
-import me.micartey.webhookly.embeds.EmbedObject;
 
 import java.awt.Color;
 
 public class JoinLeaveEventHandler {
-    private final DiscordWebhook webhook;
+    private final WebhookClient webhook;
 
-    public JoinLeaveEventHandler(DiscordWebhook webhook) {
+    public JoinLeaveEventHandler(WebhookClient webhook) {
         this.webhook = webhook;
     }
 
@@ -45,11 +46,11 @@ public class JoinLeaveEventHandler {
         );
     }
 
-    private EmbedObject buildEmbedFor(ConnectionState state, String username) {
-        // note: you can set a thumbnail but it kind of looks big
-        return new EmbedObject()
-                .setColor(state.getEmbedColor())
-                .setDescription(String.format("**%s has %s the server**", username, state));
+    private WebhookEmbed buildEmbedFor(ConnectionState state, String username) {
+        return new WebhookEmbedBuilder()
+            .setColor(state.getEmbedColor().getRGB() & 0xFFFFFF)
+            .setDescription(String.format("**%s has %s the server**", username, state))
+            .build();
     }
 
     private enum ConnectionState {

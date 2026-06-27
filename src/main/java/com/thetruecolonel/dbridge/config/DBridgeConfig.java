@@ -5,7 +5,7 @@ import net.minecraftforge.common.config.Configuration;
 import java.io.File;
 
 public class DBridgeConfig {
-    private final String webhookUrl;
+    private final String webhookId;
     private final String channelId;
     private final String botToken;
 
@@ -14,7 +14,7 @@ public class DBridgeConfig {
 
         config.load();
 
-        webhookUrl = config.get(Configuration.CATEGORY_GENERAL, "webhookUrl", "").getString();
+        webhookId = config.get(Configuration.CATEGORY_GENERAL, "webhookId", "").getString();
         channelId = config.get(Configuration.CATEGORY_GENERAL, "channelId", "").getString();
         botToken = config.get(Configuration.CATEGORY_GENERAL, "botToken", "").getString();
 
@@ -23,7 +23,7 @@ public class DBridgeConfig {
         }
     }
 
-    public String getWebhookUrl() { return webhookUrl; }
+    public String getWebhookId() { return webhookId; }
     public String getChannelId() { return channelId; }
     public String getBotToken() { return botToken; }
 }
